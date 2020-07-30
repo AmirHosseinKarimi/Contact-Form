@@ -15,7 +15,7 @@ mix.disableNotifications();
 
 mix
   .autoload({
-    jquery: ["$", "window.jQuery", "jQuery"],
+    jquery: ["window.jQuery"],
   })
   .js("src/scripts/main.js", "dist/scripts/")
   .sass("src/styles/main.scss", "dist/styles/")
