@@ -253,7 +253,7 @@ class ContactForm
      */
     public function renderAboutPage()
     {
-        echo "Yet another simple contact us plugin.";
+        require($this->plugin_path . 'includes/templates/about.php');
     }
 
     /**
