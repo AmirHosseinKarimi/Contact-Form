@@ -14,6 +14,9 @@ let mix = require("laravel-mix");
 mix.disableNotifications();
 
 mix
+  .autoload({
+    jquery: ["$", "window.jQuery", "jQuery"],
+  })
   .js("src/scripts/main.js", "dist/scripts/")
   .sass("src/styles/main.scss", "dist/styles/")
   .options({
@@ -24,4 +27,7 @@ mix
     },
   });
 
-mix.browserSync({ proxy: "contactform.test" });
+mix.browserSync({
+  proxy: "contactform.test",
+  files: ["includes/templates/*", "src/**/*"],
+});
