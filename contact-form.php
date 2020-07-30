@@ -34,6 +34,8 @@ add_action('plugins_loaded', array (ContactForm::getInstance(), 'pluginSetup'));
 add_action('wp_enqueue_scripts', array(ContactForm::getInstance(), 'enqueueAssets'));
 add_action('admin_enqueue_scripts', array(ContactForm::getInstance(), 'enqueueAdminAssets'));
 
+add_filter('post_row_actions', array(ContactForm::getInstance(), 'modifyPostRowActions'), 10, 2);
+
 add_shortcode('contact_form', array(ContactForm::getInstance(), 'shortcode'));
 
 class ContactForm
@@ -132,10 +134,28 @@ class ContactForm
         remove_post_type_support('cf_message', 'comments');
     }
 
-        add_action('wp_enqueue_scripts', array($this, 'enqueueAssets'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueueAdminAssets'));
+    /**
+     * Modify contact form messages list actions
+     *
+     * @param array $actions
+     * @param object $post
+     * @return array
+     */
+    public function modifyPostRowActions($actions, $post)
+    {
+        if ($post->post_type == "cf_message") {
+            // TODO: Add view message link
+            $view = sprintf(
+                '<a href="%1$s">%2$s</a>',
+                esc_url('#'),
+                esc_html__('View', CONTACT_FORM_DATA['domain'])
+            );
+            $actions = [$view] + $actions;
+
+            // TODO: Add Permanent Delete link
+        }
         
-        add_shortcode('contact_form', array($this, 'shortcode'));
+        return $actions;
     }
     
     /**
