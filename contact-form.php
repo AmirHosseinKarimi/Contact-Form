@@ -29,10 +29,13 @@ define('CONTACT_FORM_DATA', [
     'domain'    =>  'contact-form',
 ]);
 
+require_once(plugin_dir_path(__FILE__) . 'includes/controllers/RestMessage.php');
+
 add_action('init', array (ContactForm::getInstance(), 'registerPostType'));
 add_action('plugins_loaded', array (ContactForm::getInstance(), 'pluginSetup'));
 add_action('wp_enqueue_scripts', array(ContactForm::getInstance(), 'enqueueAssets'));
 add_action('admin_enqueue_scripts', array(ContactForm::getInstance(), 'enqueueAdminAssets'));
+add_action('rest_api_init', array(\RestMessage::getInstance(), 'registerRoutes'));
 
 add_filter('post_row_actions', array(ContactForm::getInstance(), 'modifyPostRowActions'), 10, 2);
 
@@ -124,9 +127,9 @@ class ContactForm
                 'create_posts'          => 'do_not_allow',
                 'edit_published_posts'  => 'do_not_allow',
             ),
-            // 'show_in_rest'           => true, // TODO: Add Rest API controller
-            // 'rest_base'              => 'cf_message',
-            // 'rest_controller_class'  => 'WP_REST_Posts_Controller',
+            'show_in_rest'           => true,
+            'rest_base'              => 'cf_message',
+            'rest_controller_class'  => 'ContactForm\Controllers\RestMessage',
         );
 
         register_post_type('cf_message', $args);
@@ -154,7 +157,7 @@ class ContactForm
 
             // TODO: Add Permanent Delete link
         }
-        
+
         return $actions;
     }
     
@@ -209,7 +212,7 @@ class ContactForm
     }
 
     /**
-     * Access this plugin’s working instance
+     * Access class working instance
      *
      * @wp-hook plugins_loaded
      * @return  object of this class
