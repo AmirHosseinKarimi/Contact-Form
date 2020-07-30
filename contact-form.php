@@ -176,9 +176,16 @@ class ContactForm
         );
         
         wp_enqueue_script(
+            'jquery.form',
+            $this->plugin_url . 'dist/libraries/jquery.form.min.js',
+            ['jquery'],
+            '4.3.0'
+        );
+
+        wp_enqueue_script(
             'contact-form-main',
             $this->plugin_url . 'dist/scripts/main.js',
-            ['jquery'],
+            ['jquery.form'],
             CONTACT_FORM_DATA['version'],
             true
         );
