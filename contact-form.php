@@ -34,6 +34,8 @@ add_action('init', array (ContactForm::getInstance(), 'registerPostType'));
 add_action('plugins_loaded', array (ContactForm::getInstance(), 'pluginSetup'));
 add_action('wp_enqueue_scripts', array(ContactForm::getInstance(), 'enqueueAssets'));
 add_action('admin_enqueue_scripts', array(ContactForm::getInstance(), 'enqueueAdminAssets'));
+add_action('admin_menu', array(ContactForm::getInstance(), 'registerAdminPages'));
+add_action('admin_head', array(ContactForm::getInstance(), 'hideAdminPages'));
 add_action('rest_api_init', array(\RestMessage::getInstance(), 'registerRoutes'));
 
 add_filter('post_row_actions', array(ContactForm::getInstance(), 'modifyPostRowActions'), 10, 2);
@@ -95,43 +97,41 @@ class ContactForm
     public function registerPostType()
     {
         $labels = array(
-            'name'               => _x('Messages', 'post type general name', 'contact_form'),
-            'singular_name'      => _x('Message', 'post type singular name', 'contact_form'),
-            'menu_name'          => _x('Messages', 'admin menu', 'contact_form'),
-            'name_admin_bar'     => _x('Message', 'add new on admin bar', 'contact_form'),
-            'add_new'            => _x('Add New', 'contact form', 'contact_form'),
-            'add_new_item'       => __('Add New Message', 'contact_form'),
-            'new_item'           => __('New Message', 'contact_form'),
-            'edit_item'          => __('Edit Message', 'contact_form'),
-            'view_item'          => __('View Message', 'contact_form'),
-            'all_items'          => __('All Messages', 'contact_form'),
-            'search_items'       => __('Search Messages', 'contact_form'),
-            'parent_item_colon'  => __('Parent Messages:', 'contact_form'),
-            'not_found'          => __('No messages found.', 'contact_form'),
-            'not_found_in_trash' => __('No messages found in Trash.', 'contact_form')
+        'name'               => _x('Messages', 'post type general name', 'contact_form'),
+        'singular_name'      => _x('Message', 'post type singular name', 'contact_form'),
+        'menu_name'          => _x('Messages', 'admin menu', 'contact_form'),
+        'name_admin_bar'     => _x('Message', 'add new on admin bar', 'contact_form'),
+        'add_new'            => _x('Add New', 'contact form', 'contact_form'),
+        'add_new_item'       => __('Add New Message', 'contact_form'),
+        'new_item'           => __('New Message', 'contact_form'),
+        'edit_item'          => __('Edit Message', 'contact_form'),
+        'view_item'          => __('View Message', 'contact_form'),
+        'all_items'          => __('All Messages', 'contact_form'),
+        'search_items'       => __('Search Messages', 'contact_form'),
+        'parent_item_colon'  => __('Parent Messages:', 'contact_form'),
+        'not_found'          => __('No messages found.', 'contact_form'),
+        'not_found_in_trash' => __('No messages found in Trash.', 'contact_form')
         );
 
-        $args = array(
-            'labels'                    => $labels,
-            'description'               => __('Contact Form Messages', 'contact_form'),
-            'public'                    => false,
-            'show_ui'                   => true,
-            'show_in_menu'              => true,
-            'show_in_admin_bar'         => false,
-            'rewrite'                   => false,
-            'supports'                  => array('title', 'custom-fields'),
-            'capability_type'           => 'post',
-            'map_meta_cap'              => true,
-            'capabilities'              => array(
-                'create_posts'          => 'do_not_allow',
-                'edit_published_posts'  => 'do_not_allow',
-            ),
-            'show_in_rest'           => true,
-            'rest_base'              => 'cf_message',
-            'rest_controller_class'  => 'ContactForm\Controllers\RestMessage',
-        );
-
-        register_post_type('cf_message', $args);
+        register_post_type('cf_message', array(
+        'labels'                    => $labels,
+        'description'               => __('Contact Form Messages', 'contact_form'),
+        'public'                    => false,
+        'show_ui'                   => true,
+        'show_in_menu'              => 'contact_form',
+        'show_in_admin_bar'         => false,
+        'rewrite'                   => false,
+        'supports'                  => array('title', 'custom-fields'),
+        'capability_type'           => 'post',
+        'map_meta_cap'              => true,
+        'capabilities'              => array(
+            'create_posts'          => 'do_not_allow',
+            'edit_published_posts'  => 'do_not_allow',
+        ),
+        'show_in_rest'           => true,
+        'rest_base'              => 'cf_message',
+        'rest_controller_class'  => 'ContactForm\Controllers\RestMessage',
+        ));
 
         remove_post_type_support('cf_message', 'comments');
     }
@@ -146,10 +146,11 @@ class ContactForm
     public function modifyPostRowActions($actions, $post)
     {
         if ($post->post_type == "cf_message") {
-            // TODO: Add view message link
+            $viewPageUrl = menu_page_url('contact_form_view', false);
+
             $view = sprintf(
                 '<a href="%1$s">%2$s</a>',
-                esc_url('#'),
+                esc_url("{$viewPageUrl}&post={$post->ID}"),
                 esc_html__('View', 'contact_form')
             );
             $actions = [$view] + $actions;
@@ -199,6 +200,79 @@ class ContactForm
     {
     }
 
+    /**
+     * Register admin option pages
+     *
+     * @return void
+     */
+    public function registerAdminPages()
+    {
+        add_menu_page(
+            __('Contact Form', 'contact_form'),
+            __('Contact Form', 'contact_form'),
+            'edit_posts',
+            'contact_form',
+            '',
+            'dashicons-text-page',
+            20
+        );
+
+        add_submenu_page(
+            'contact_form',
+            __('View message data', 'contact_form'),
+            'View message',
+            'edit_posts',
+            'contact_form_view',
+            array($this, 'renderViewMessagePage')
+        );
+
+        add_submenu_page(
+            'contact_form',
+            __('About Contact Form', 'contact_form'),
+            __('About', 'contact_form'),
+            'edit_posts',
+            'contact_form_about',
+            array($this, 'renderAboutPage')
+        );
+    }
+
+    /**
+     * Hide pages in admin panel
+     *
+     * @return void
+     */
+    public function hideAdminPages()
+    {
+        remove_submenu_page('contact_form', 'contact_form_view');
+    }
+
+    /**
+     * Render about page in admin panel
+     *
+     * @return void
+     */
+    public function renderAboutPage()
+    {
+        echo "Yet another simple contact us plugin.";
+    }
+
+    /**
+     * Render about page in admin panel
+     *
+     * @return void
+     */
+    public function renderViewMessagePage()
+    {
+        $postId = (int)$_GET['post'] ?? false;
+        if ($postId && ($post = get_post($postId))) {
+            $name = get_post_meta($post->ID, 'cf_name', true);
+            $email = get_post_meta($post->ID, 'cf_email', true);
+            require($this->plugin_path . 'includes/templates/message-data.php');
+        } else {
+            require($this->plugin_path . 'includes/templates/message-not-found.php');
+        }
+    }
+    
     /**
      * Handle short code
      *
