@@ -53,7 +53,7 @@ class RestMessage extends WP_REST_Controller
         }
 
         $name = $request->get_param('name') ?? '';
-        if (empty($name) || mb_strlen($name)>30) {
+        if (empty($name) || mb_strlen($name)>40) {
             return new WP_Error(
                 'invalid_name',
                 __('Please enter your name.', 'contact_form'),
@@ -62,7 +62,7 @@ class RestMessage extends WP_REST_Controller
         }
 
         $email = $request->get_param('email') ?? '';
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email)>120) {
             return new WP_Error(
                 'invalid_email',
                 __('Please enter your email address.', 'contact_form'),
@@ -81,22 +81,23 @@ class RestMessage extends WP_REST_Controller
             return new WP_Error('long_message', __('Message is too long.', 'contact_form'), array( 'status' => 400 ));
         }
 
-        $dateFormat = get_option('date_format');
-        $timeFormat = get_option('time_format');
-        $currentDateTime = date_i18n($dateFormat.' '.$timeFormat, time());
+        $postTitle = wp_strip_all_tags($name) . ' - ' . wp_strip_all_tags($email);
 
-        $messageContent = [
-            'name'      => sanitize_text_field($name),
-            'email'     => sanitize_email($email),
-            'message'   => sanitize_textarea_field($message),
-        ];
-
+        // Do not need sanitizing
+        // @see https://developer.wordpress.org/reference/functions/wp_insert_post/#security
+        // @see https://wordpress.stackexchange.com/questions/24436/how-safe-sanitized-is-wp-insert-posts
         $newMessage = wp_insert_post(array(
-            'post_title'    => $messageContent['name'] . ' - ' . $currentDateTime,
+            'post_title'    => $postTitle,
             'post_type'     => 'cf_message',
-            'post_content'  => json_encode($messageContent),
+            'post_content'  => $message,
             'post_status'   => 'publish',
-            'post_author'   => 1,
+            'post_author'   => 0,
+            'comment_status'=> 'closed',
+            'meta_input'    => array(
+                'read'      => 0,
+                'cf_name'   => $name,
+                'cf_email'  => $email,
+            ),
         ));
 
         if (is_wp_error($newMessage)) {
