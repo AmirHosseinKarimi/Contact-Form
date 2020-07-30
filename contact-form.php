@@ -25,13 +25,16 @@ namespace contactForm;
  */
 
 define('CONTACT_FORM_DATA', [
-    'version' => '1.0.0',
+    'version'   => '1.0.0',
+    'domain'    =>  'contact-form',
 ]);
 
-add_action(
-    'plugins_loaded',
-    array (ContactForm::getInstance(), 'pluginSetup')
-);
+add_action('init', array (ContactForm::getInstance(), 'registerPostType'));
+add_action('plugins_loaded', array (ContactForm::getInstance(), 'pluginSetup'));
+add_action('wp_enqueue_scripts', array(ContactForm::getInstance(), 'enqueueAssets'));
+add_action('admin_enqueue_scripts', array(ContactForm::getInstance(), 'enqueueAdminAssets'));
+
+add_shortcode('contact_form', array(ContactForm::getInstance(), 'shortcode'));
 
 class ContactForm
 {
@@ -77,8 +80,57 @@ class ContactForm
         $this->plugin_url    = plugins_url('/', __FILE__);
         $this->plugin_path   = plugin_dir_path(__FILE__);
         
-        $this->loadLanguage('contact-form');
-        $this->enqueueAssets();
+        $this->loadLanguage(CONTACT_FORM_DATA['domain']);
+    }
+
+    /**
+     * Register custom post type
+     *
+     * @return void
+     */
+    public function registerPostType()
+    {
+        $labels = array(
+            'name'               => _x('Messages', 'post type general name', CONTACT_FORM_DATA['domain']),
+            'singular_name'      => _x('Message', 'post type singular name', CONTACT_FORM_DATA['domain']),
+            'menu_name'          => _x('Messages', 'admin menu', CONTACT_FORM_DATA['domain']),
+            'name_admin_bar'     => _x('Message', 'add new on admin bar', CONTACT_FORM_DATA['domain']),
+            'add_new'            => _x('Add New', 'contact form', CONTACT_FORM_DATA['domain']),
+            'add_new_item'       => __('Add New Message', CONTACT_FORM_DATA['domain']),
+            'new_item'           => __('New Message', CONTACT_FORM_DATA['domain']),
+            'edit_item'          => __('Edit Message', CONTACT_FORM_DATA['domain']),
+            'view_item'          => __('View Message', CONTACT_FORM_DATA['domain']),
+            'all_items'          => __('All Messages', CONTACT_FORM_DATA['domain']),
+            'search_items'       => __('Search Messages', CONTACT_FORM_DATA['domain']),
+            'parent_item_colon'  => __('Parent Messages:', CONTACT_FORM_DATA['domain']),
+            'not_found'          => __('No messages found.', CONTACT_FORM_DATA['domain']),
+            'not_found_in_trash' => __('No messages found in Trash.', CONTACT_FORM_DATA['domain'])
+        );
+
+        $args = array(
+            'labels'                    => $labels,
+            'description'               => __('Contact Form Messages', CONTACT_FORM_DATA['domain']),
+            'public'                    => false,
+            'show_ui'                   => true,
+            'show_in_menu'              => true,
+            'show_in_admin_bar'         => false,
+            'rewrite'                   => false,
+            'supports'                  => array('title', 'custom-fields'),
+            'capability_type'           => 'post',
+            'map_meta_cap'              => true,
+            'capabilities'              => array(
+                'create_posts'          => 'do_not_allow',
+                'edit_published_posts'  => 'do_not_allow',
+            ),
+            // 'show_in_rest'           => true, // TODO: Add Rest API controller
+            // 'rest_base'              => 'cf_message',
+            // 'rest_controller_class'  => 'WP_REST_Posts_Controller',
+        );
+
+        register_post_type('cf_message', $args);
+
+        remove_post_type_support('cf_message', 'comments');
+    }
 
         add_action('wp_enqueue_scripts', array($this, 'enqueueAssets'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueAdminAssets'));
