@@ -11,6 +11,8 @@ let mix = require("laravel-mix");
  |
  */
 
+mix.disableNotifications();
+
 mix
   .js("src/scripts/main.js", "dist/scripts/")
   .sass("src/styles/main.scss", "dist/styles/")
@@ -21,3 +23,5 @@ mix
       },
     },
   });
+
+mix.browserSync({ proxy: "contactform.test" });
