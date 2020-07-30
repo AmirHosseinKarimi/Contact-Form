@@ -1,6 +1,6 @@
 <div id="contact-form" class="cf">
   <h3><?php echo esc_html($attrs['title']) ?></h3>
-  <form action="/" method="POST">
+  <form action="<?php echo esc_url(get_rest_url(null, 'contact-form/message')) ?>" method="POST">
     <div class="cf-row">
       <label for="cf-name">Name</label>
       <input type="text" id="cf-name" name="name" required placeholder="John Doe">

@@ -12,10 +12,26 @@
     label {
       font-weight: bold;
     }
+
+    textarea {
+      resize: vertical;
+    }
   }
 
   #cf-submit {
     display: block;
     width: 100%;
+  }
+
+  .cf-message {
+    border: 1px solid red;
+    background-color: rgba(red, 0.2);
+    border-radius: 6px;
+    padding: 5px 10px;
+
+    &.cf-success-message {
+      border-color: green;
+      background-color: rgba(green, 0.2);
+    }
   }
 }
