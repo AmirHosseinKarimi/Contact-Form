@@ -1,0 +1,21 @@
+#contact-form.cf {
+  display: block;
+  margin: 10px auto;
+
+  h3 {
+    margin-bottom: 15px;
+  }
+
+  .cf-row {
+    margin-bottom: 15px;
+
+    label {
+      font-weight: bold;
+    }
+  }
+
+  #cf-submit {
+    display: block;
+    width: 100%;
+  }
+}

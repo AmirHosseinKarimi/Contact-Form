@@ -30,7 +30,7 @@ define('CONTACT_FORM_DATA', [
 
 add_action(
     'plugins_loaded',
-    array ( ContactForm::getInstance(), 'pluginSetup' )
+    array (ContactForm::getInstance(), 'pluginSetup')
 );
 
 class ContactForm
@@ -80,8 +80,10 @@ class ContactForm
         $this->loadLanguage('contact-form');
         $this->enqueueAssets();
 
-        add_action('wp_enqueue_scripts', array($this,'enqueueAssets'));
-        add_action('admin_enqueue_scripts', array($this,'enqueueAdminAssets'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueueAssets'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueueAdminAssets'));
+        
+        add_shortcode('contact_form', array($this, 'shortcode'));
     }
     
     /**
@@ -114,6 +116,24 @@ class ContactForm
      */
     public function enqueueAdminAssets()
     {
+    }
+
+    /**
+     * Handle short code
+     *
+     * @param array $attrs
+     * @return string
+     */
+    public function shortcode($attrs)
+    {
+        $attrs = shortcode_atts(array(
+            'title' => 'Contact Form',
+            'submit_text' => 'Send',
+        ), $attrs);
+
+        ob_start();
+        require($this->plugin_path . 'includes/templates/form.php');
+        return ob_get_clean();
     }
 
     /**
