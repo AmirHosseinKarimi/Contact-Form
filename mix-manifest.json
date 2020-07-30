@@ -1,4 +1,5 @@
 {
     "/dist/scripts/main.js": "/dist/scripts/main.js",
-    "/dist/styles/main.css": "/dist/styles/main.css"
+    "/dist/styles/main.css": "/dist/styles/main.css",
+    "/dist/libraries/jquery.form.min.js": "/dist/libraries/jquery.form.min.js"
 }

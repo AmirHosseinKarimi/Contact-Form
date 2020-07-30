@@ -27,6 +27,8 @@ mix
     },
   });
 
+mix.copy(`src/libraries/*`, "dist/libraries");
+
 mix.browserSync({
   proxy: "contactform.test",
   files: ["includes/templates/*", "src/**/*"],
