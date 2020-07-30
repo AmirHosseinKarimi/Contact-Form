@@ -26,7 +26,6 @@ namespace contactForm;
 
 define('CONTACT_FORM_DATA', [
     'version'   => '1.0.0',
-    'domain'    =>  'contact-form',
 ]);
 
 require_once(plugin_dir_path(__FILE__) . 'includes/controllers/RestMessage.php');
@@ -85,7 +84,7 @@ class ContactForm
         $this->plugin_url    = plugins_url('/', __FILE__);
         $this->plugin_path   = plugin_dir_path(__FILE__);
         
-        $this->loadLanguage(CONTACT_FORM_DATA['domain']);
+        $this->loadLanguage('contact_form');
     }
 
     /**
@@ -96,25 +95,25 @@ class ContactForm
     public function registerPostType()
     {
         $labels = array(
-            'name'               => _x('Messages', 'post type general name', CONTACT_FORM_DATA['domain']),
-            'singular_name'      => _x('Message', 'post type singular name', CONTACT_FORM_DATA['domain']),
-            'menu_name'          => _x('Messages', 'admin menu', CONTACT_FORM_DATA['domain']),
-            'name_admin_bar'     => _x('Message', 'add new on admin bar', CONTACT_FORM_DATA['domain']),
-            'add_new'            => _x('Add New', 'contact form', CONTACT_FORM_DATA['domain']),
-            'add_new_item'       => __('Add New Message', CONTACT_FORM_DATA['domain']),
-            'new_item'           => __('New Message', CONTACT_FORM_DATA['domain']),
-            'edit_item'          => __('Edit Message', CONTACT_FORM_DATA['domain']),
-            'view_item'          => __('View Message', CONTACT_FORM_DATA['domain']),
-            'all_items'          => __('All Messages', CONTACT_FORM_DATA['domain']),
-            'search_items'       => __('Search Messages', CONTACT_FORM_DATA['domain']),
-            'parent_item_colon'  => __('Parent Messages:', CONTACT_FORM_DATA['domain']),
-            'not_found'          => __('No messages found.', CONTACT_FORM_DATA['domain']),
-            'not_found_in_trash' => __('No messages found in Trash.', CONTACT_FORM_DATA['domain'])
+            'name'               => _x('Messages', 'post type general name', 'contact_form'),
+            'singular_name'      => _x('Message', 'post type singular name', 'contact_form'),
+            'menu_name'          => _x('Messages', 'admin menu', 'contact_form'),
+            'name_admin_bar'     => _x('Message', 'add new on admin bar', 'contact_form'),
+            'add_new'            => _x('Add New', 'contact form', 'contact_form'),
+            'add_new_item'       => __('Add New Message', 'contact_form'),
+            'new_item'           => __('New Message', 'contact_form'),
+            'edit_item'          => __('Edit Message', 'contact_form'),
+            'view_item'          => __('View Message', 'contact_form'),
+            'all_items'          => __('All Messages', 'contact_form'),
+            'search_items'       => __('Search Messages', 'contact_form'),
+            'parent_item_colon'  => __('Parent Messages:', 'contact_form'),
+            'not_found'          => __('No messages found.', 'contact_form'),
+            'not_found_in_trash' => __('No messages found in Trash.', 'contact_form')
         );
 
         $args = array(
             'labels'                    => $labels,
-            'description'               => __('Contact Form Messages', CONTACT_FORM_DATA['domain']),
+            'description'               => __('Contact Form Messages', 'contact_form'),
             'public'                    => false,
             'show_ui'                   => true,
             'show_in_menu'              => true,
@@ -151,7 +150,7 @@ class ContactForm
             $view = sprintf(
                 '<a href="%1$s">%2$s</a>',
                 esc_url('#'),
-                esc_html__('View', CONTACT_FORM_DATA['domain'])
+                esc_html__('View', 'contact_form')
             );
             $actions = [$view] + $actions;
 
