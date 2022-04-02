@@ -7,21 +7,20 @@
   "author": "Amir hossein Karimi <amir.hossein7464@gmail.com>",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "dev": "npm run development",
-    "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "npm run development -- --watch",
-    "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "prod": "npm run production",
-    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    "dev": "mix",
+    "watch": "mix watch",
+    "watch-poll": "mix watch -- --watch-options-poll=1000",
+    "hot": "mix watch --hot",
+    "build": "mix --production"
   },
   "devDependencies": {
     "browser-sync": "^2.26.12",
-    "browser-sync-webpack-plugin": "2.0.1",
+    "browser-sync-webpack-plugin": "^2.3.0",
     "cross-env": "^7.0.2",
-    "laravel-mix": "^5.0.4",
-    "resolve-url-loader": "^3.1.1",
+    "laravel-mix": "^6.0.43",
+    "resolve-url-loader": "^5.0.0",
     "sass": "^1.26.10",
-    "sass-loader": "^9.0.2",
+    "sass-loader": "^12.6.0",
     "vue-template-compiler": "^2.6.11"
   },
   "dependencies": {}
